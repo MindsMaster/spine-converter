@@ -6,6 +6,8 @@
 
 Spine skeleton data converter for versions 3.5 to 4.3
 
+[![Open web app](https://img.shields.io/badge/Open%20web%20app-e8590c?style=for-the-badge)](https://mindsmaster.github.io/spine-converter/)
+
 [![Spine](https://img.shields.io/badge/Spine-3.5%20%E2%80%93%204.3-e8590c.svg)](docs/conversion.md)
 [![Formats](https://img.shields.io/badge/formats-JSON%20%C2%B7%20skel%20%C2%B7%20atlas-1f6feb.svg)](#features)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-8250df.svg)](#interfaces)
@@ -27,6 +29,17 @@ Spine skeleton data converter for versions 3.5 to 4.3
 
 spine-converter converts [Spine](https://esotericsoftware.com) skeleton data and texture atlases between Spine versions 3.5 and 4.3. It is not affiliated with Esoteric Software.
 
+## Web app
+
+The [web app](https://mindsmaster.github.io/spine-converter/) converts files in the browser without installation. It accepts files, folders and `.zip` archives, groups each skeleton with its atlas and textures, and downloads the results one at a time or as a ZIP. Conversion runs in WebAssembly inside the page.
+
+<a href="https://mindsmaster.github.io/spine-converter/">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/web-dark.png">
+  <img src=".github/web-light.png" alt="spine-converter web app">
+</picture>
+</a>
+
 ## Features
 
 | Feature | Description |
@@ -40,10 +53,11 @@ spine-converter converts [Spine](https://esotericsoftware.com) skeleton data and
 
 ## Interfaces
 
-An application that ships one Spine runtime version can convert exports of other versions at load time through a library, or convert files ahead of time with the CLI.
+An application that ships one Spine runtime version can convert exports of other versions at load time through a library, or convert files ahead of time with the CLI or the web app.
 
 | Interface | Platforms | Documentation |
 |---|---|---|
+| Web app | current browsers | [Web app](#web-app) |
 | CLI | Windows x64, x86 and arm64, macOS and Linux x64 and arm64 | [Command line](#command-line) |
 | C | same platforms, shared and static | [bindings/c](bindings/c/README.md) |
 | C++ | same platforms, header only | [bindings/cpp](bindings/cpp/README.md) |

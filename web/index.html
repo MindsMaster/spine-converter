@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <script>
+      try {
+        document.querySelector('meta[name="color-scheme"]').content = localStorage.getItem("color-scheme") ?? "light dark";
+      } catch {}
+    </script>
+    <meta name="description" content="Convert Spine skeleton data and atlases between versions 3.5 and 4.3 in the browser">
+    <title>spine-converter</title>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mindsmaster.github.io/spine-converter/">
+    <meta property="og:title" content="spine-converter">
+    <meta property="og:description" content="Convert Spine skeleton data and atlases between versions 3.5 and 4.3 in the browser">
+    <meta property="og:image" content="https://mindsmaster.github.io/spine-converter/og.png">
+    <meta property="og:image:width" content="2400">
+    <meta property="og:image:height" content="1260">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" type="image/svg+xml" href="../.github/icon.svg">
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

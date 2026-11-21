@@ -1,0 +1,60 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["web/**", "bindings/js/**", "src/**", "build.zig", "build.zig.zon", "docs/report.zh-CN.md", ".github/icon.svg", ".github/workflows/pages.yml"]
+  pull_request:
+    paths: ["web/**", "bindings/js/**", "src/**", "build.zig", "build.zig.zon", "docs/report.zh-CN.md", ".github/icon.svg", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: 0.17.1
+      - uses: actions/setup-node@v5
+        with:
+          node-version: lts/*
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: web/package.json
+
+      - run: zig build wasm -Dcommit="${GITHUB_SHA::12}"
+      - name: JavaScript binding
+        working-directory: bindings/js
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+      - name: Web app
+        working-directory: web
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: web/dist
+
+  deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

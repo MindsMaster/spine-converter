@@ -26,6 +26,7 @@
 | `oracle/` | dumpers built from official runtimes, pose comparator, check scripts, fixtures |
 | `tests/` | ABI smoke test, corpus runner and damaged input generator |
 | `tools/` | scripts that export corpus and runtimes from spine-runtimes, release and package builders |
+| `web/` | browser converter over the JS binding, deployed to GitHub Pages by `.github/workflows/pages.yml` |
 | `docs/` | user docs `conversion` `report` `stability`, each with a `.zh-CN.md` translation |
 | `docs/architecture.md` `docs/changes/` | contributor docs in English only, `docs/changes/README.md` indexes the runtime changes |
 
