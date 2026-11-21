@@ -41,6 +41,7 @@ oracle/all.sh
 | Binding | Test |
 |---|---|
 | C and C++ | part of `zig build test` |
+| Android | `zig build dist -Drid=android-x64 -Dandroid-ndk=<path>` and the same for `android-arm64`, then `tests/android.sh <path>` with a device or emulator on adb |
 | C# | `dotnet run --project bindings/csharp/Tests` after `zig build dist` |
 | JavaScript | `pnpm install`, `pnpm run build` and `pnpm test` in `bindings/js` after `zig build wasm` |
 | Python | see [bindings/python/README.md](bindings/python/README.md) |

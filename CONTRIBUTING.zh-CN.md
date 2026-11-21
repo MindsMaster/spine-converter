@@ -41,6 +41,7 @@ oracle/all.sh
 | 绑定 | 测试 |
 |---|---|
 | C 与 C++ | 包含在 `zig build test` 中 |
+| Android | 先 `zig build dist -Drid=android-x64 -Dandroid-ndk=<path>`，`android-arm64` 同样构建，再在 adb 连接设备或模拟器后运行 `tests/android.sh <path>` |
 | C# | 先 `zig build dist`，再 `dotnet run --project bindings/csharp/Tests` |
 | JavaScript | 先 `zig build wasm`，再在 `bindings/js` 中运行 `pnpm install`、`pnpm run build` 和 `pnpm test` |
 | Python | 见 [bindings/python/README.zh-CN.md](bindings/python/README.zh-CN.md) |

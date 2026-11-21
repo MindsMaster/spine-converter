@@ -86,3 +86,40 @@ jobs:
             chmod +x "$RUNNER_TEMP/godot-$version/Godot_v$version-stable_linux.x86_64"
             bindings/godot/tests/run.sh "$RUNNER_TEMP/godot-$version/Godot_v$version-stable_linux.x86_64" "$RUNNER_TEMP/godot.zip"
           done
+
+  android:
+    strategy:
+      fail-fast: false
+      matrix:
+        # the oldest supported and the newest release
+        api: [21, 36]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: 0.17.1
+
+      - run: |
+          zig build dist -Drid=android-arm64 -Dandroid-ndk="$ANDROID_NDK_HOME"
+          zig build dist -Drid=android-x64 -Dandroid-ndk="$ANDROID_NDK_HOME"
+      - name: 16 KB pages
+        run: |
+          for so in zig-out/dist/android-*/*.so; do
+            readelf -lW "$so" | awk '$1 == "LOAD" && $NF != "0x4000" { bad = 1 } END { exit bad }'
+          done
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api }}
+          arch: x86_64
+          target: google_apis
+          # default data partition exceeds the runner disk
+          disk-size: 2048M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: tests/android.sh "$ANDROID_NDK_HOME"

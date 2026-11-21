@@ -15,7 +15,9 @@ const oracles = [_]Oracle{
 };
 
 /// rid is the .NET runtime identifier the C# binding loads from, godot the feature tag of the Godot extension
-const Dist = struct { triple: []const u8, rid: []const u8, godot: []const u8 };
+const Dist = struct { triple: []const u8, rid: []const u8, godot: []const u8, libc: LibC = .zig };
+/// Zig ships no bionic
+const LibC = enum { zig, ndk };
 const dists = [_]Dist{
     .{ .triple = "x86_64-windows", .rid = "win-x64", .godot = "windows.x86_64" },
     .{ .triple = "aarch64-windows", .rid = "win-arm64", .godot = "windows.arm64" },
@@ -24,6 +26,8 @@ const dists = [_]Dist{
     .{ .triple = "x86_64-macos.10.15", .rid = "osx-x64", .godot = "macos.x86_64" },
     .{ .triple = "x86_64-linux", .rid = "linux-x64", .godot = "linux.x86_64" },
     .{ .triple = "aarch64-linux", .rid = "linux-arm64", .godot = "linux.arm64" },
+    .{ .triple = "aarch64-linux-android.21", .rid = "android-arm64", .godot = "android.arm64", .libc = .ndk },
+    .{ .triple = "x86_64-linux-android.21", .rid = "android-x64", .godot = "android.x86_64", .libc = .ndk },
 };
 
 pub fn build(b: *std.Build) void {
@@ -50,16 +54,35 @@ pub fn build(b: *std.Build) void {
     const dist = b.step("dist", "Build the shared library for every release platform");
     const godot = b.step("godot", "Build the Godot extension for every release platform");
     const only = b.option([]const u8, "rid", "Build dist and godot for this runtime identifier only");
+    const ndk = b.option([]const u8, "android-ndk", "Android NDK to build the Android targets with, skipped without");
     for (dists) |d| {
         if (only) |rid| if (!std.mem.eql(u8, rid, d.rid)) continue;
         const query = std.Target.Query.parse(.{ .arch_os_abi = d.triple }) catch unreachable;
-        const abi = abiModule(b, b.createModule(coreOptions(b, b.resolveTargetQuery(query), .ReleaseFast)));
+        const resolved = b.resolveTargetQuery(query);
+        const libc: ?std.Build.LazyPath = switch (d.libc) {
+            .zig => null,
+            .ndk => if (ndk) |path| androidLibC(b, path, resolved.result) else {
+                if (only != null) {
+                    const fail = b.addFail(b.fmt("{s} needs -Dandroid-ndk", .{d.rid}));
+                    dist.dependOn(&fail.step);
+                    godot.dependOn(&fail.step);
+                }
+                continue;
+            },
+        };
+        // Google Play page size requirement
+        const max_page_size: ?u64 = if (libc != null) 16 * 1024 else null;
+        const core_module = b.createModule(coreOptions(b, resolved, .ReleaseFast));
+        if (libc != null) core_module.link_libc = true;
+        const abi = abiModule(b, core_module);
         const shared = b.addLibrary(.{
             .name = "spine_converter",
             .linkage = .dynamic,
             .root_module = abi,
         });
         shared.root_module.strip = true;
+        shared.setLibCFile(libc);
+        shared.link_z_max_page_size = max_page_size;
         const dir: std.Build.InstallDir = .{ .custom = b.fmt("dist/{s}", .{d.rid}) };
         dist.dependOn(&b.addInstallArtifact(shared, .{
             .dest_dir = .{ .override = dir },
@@ -79,6 +102,8 @@ pub fn build(b: *std.Build) void {
                 .imports = &.{.{ .name = "abi", .module = abi }},
             }),
         });
+        extension.setLibCFile(libc);
+        extension.link_z_max_page_size = max_page_size;
         godot.dependOn(&b.addInstallArtifact(extension, .{
             .dest_dir = .{ .override = .{ .custom = b.fmt("godot/{s}", .{d.godot}) } },
             .implib_dir = .disabled,
@@ -209,6 +234,28 @@ fn abiModule(b: *std.Build, core: *std.Build.Module) *std.Build.Module {
         .optimize = core.optimize,
         .imports = &.{.{ .name = "spine_converter", .module = core }},
     });
+}
+
+/// Libc file over the NDK sysroot, crt objects per API level
+fn androidLibC(b: *std.Build, ndk: []const u8, target: std.Target) std.Build.LazyPath {
+    const host = switch (b.graph.host.result.os.tag) {
+        .windows => "windows-x86_64",
+        .macos => "darwin-x86_64",
+        else => "linux-x86_64",
+    };
+    const usr = b.pathJoin(&.{ ndk, "toolchains", "llvm", "prebuilt", host, "sysroot", "usr" });
+    const triple = b.fmt("{t}-linux-android", .{target.cpu.arch});
+    const crt = b.pathJoin(&.{ usr, "lib", triple, b.fmt("{d}", .{target.os.version_range.linux.android}) });
+    return b.addWriteFiles().add("libc.txt", b.fmt(
+        \\include_dir={s}
+        \\sys_include_dir={s}
+        \\cc_dir={s}
+        \\crt_dir={s}
+        \\msvc_lib_dir=
+        \\kernel32_lib_dir=
+        \\darwin_sdk_dir=
+        \\
+    , .{ b.pathJoin(&.{ usr, "include" }), b.pathJoin(&.{ usr, "include", triple }), crt, crt }));
 }
 
 fn importing(b: *std.Build, path: []const u8, core: *std.Build.Module, optimize: std.builtin.OptimizeMode) *std.Build.Module {

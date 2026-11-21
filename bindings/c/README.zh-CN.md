@@ -2,7 +2,7 @@
 
 # C 库
 
-C ABI 声明于 [include/spine_converter.h](../../include/spine_converter.h)，其他所有绑定都调用它。库只依赖操作系统：Windows 上为 `ntdll.dll`，macOS 上为 `libSystem`，Linux 上没有依赖，glibc 和 musl 系统均可加载。
+C ABI 声明于 [include/spine_converter.h](../../include/spine_converter.h)，其他所有绑定都调用它。库只依赖操作系统：Windows 上为 `ntdll.dll`，macOS 上为 `libSystem`，Linux 上没有依赖，glibc 和 musl 系统均可加载，Android 5.0 及以上为 `libc.so` 和 `libm.so`。
 
 ## 链接
 
@@ -18,7 +18,7 @@ C ABI 声明于 [include/spine_converter.h](../../include/spine_converter.h)，�
 cc app.c -Ispine-converter/include -Lspine-converter/lib -lspine_converter
 ```
 
-`zig build` 将静态库构建到 `zig-out/lib`，`zig build dist` 将各平台的动态库构建到 `zig-out/dist/<rid>`。
+`zig build` 将静态库构建到 `zig-out/lib`，`zig build dist` 将各平台的动态库构建到 `zig-out/dist/<rid>`。Android 的库仅在 `-Dandroid-ndk=<path>` 指定 Android NDK 时构建。
 
 ## 用法
 
