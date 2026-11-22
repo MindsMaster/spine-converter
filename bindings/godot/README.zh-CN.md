@@ -8,9 +8,10 @@
 |---|---|
 | Godot | 4.3 及以上，单精度构建 |
 | 编辑器与导出 | Windows x86_64、x86_32 和 arm64，macOS universal，Linux x86_64 和 arm64 |
-| 测试 | `tests/run.sh`，在 Godot 4.3 和 4.7.2 上运行 |
+| 导出 | Android arm64 和 x86_64 |
+| 测试 | `tests/run.sh`，在 Godot 4.3 和 4.7.2 上运行，`tests/android.sh`，在 Android 5.0 和 16 上运行 |
 
-Android、iOS 和 Web 导出在该插件中没有对应的库。
+勾选 `armeabi-v7a` 或 `x86` 的 Android 导出会因缺少库而失败。iOS 和 Web 导出在该插件中没有对应的库。
 
 ## 安装
 
@@ -63,9 +64,11 @@ Godot .NET 项目也可以改用 NuGet 包中的 [C# 绑定](../csharp/README.zh
 ## 构建
 
 ```
-zig build godot
+zig build godot -Dandroid-ndk=<path>
 python3 tools/godot_package.py spine-converter-godot.zip
 bindings/godot/tests/run.sh <godot binary> spine-converter-godot.zip
 ```
+
+`-Dandroid-ndk=<path>` 指定 Android 库所需的 Android NDK。`tests/export_android.sh <godot binary> <addon zip> <apk>` 导出测试项目，需要 Android 导出模板、`ANDROID_HOME` 和 `JAVA_HOME`。`tests/android.sh <apk>` 在 adb 连接的设备或模拟器上运行它。
 
 `tools/package.sh` 为发布构建同一文件。

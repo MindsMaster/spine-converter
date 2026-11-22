@@ -8,9 +8,10 @@ The addon is a GDExtension that registers the class `SpineConverter`. Its static
 |---|---|
 | Godot | 4.3 or later, single precision builds |
 | Editor and exports | Windows x86_64, x86_32 and arm64, macOS universal, Linux x86_64 and arm64 |
-| Tests | `tests/run.sh` on Godot 4.3 and 4.7.2 |
+| Exports | Android arm64 and x86_64 |
+| Tests | `tests/run.sh` on Godot 4.3 and 4.7.2, `tests/android.sh` on Android 5.0 and 16 |
 
-Android, iOS and Web exports have no library in this addon.
+Android exports with `armeabi-v7a` or `x86` enabled fail for want of a library. iOS and Web exports have no library in this addon.
 
 ## Installation
 
@@ -63,9 +64,11 @@ Godot .NET projects can use the [C# binding](../csharp/README.md) from the NuGet
 ## Building
 
 ```
-zig build godot
+zig build godot -Dandroid-ndk=<path>
 python3 tools/godot_package.py spine-converter-godot.zip
 bindings/godot/tests/run.sh <godot binary> spine-converter-godot.zip
 ```
+
+`-Dandroid-ndk=<path>` names the Android NDK the Android libraries need. `tests/export_android.sh <godot binary> <addon zip> <apk>` exports the test project and needs the Android export templates, `ANDROID_HOME` and `JAVA_HOME`. `tests/android.sh <apk>` runs it on the device or emulator on adb.
 
 `tools/package.sh` builds the same file for a release.

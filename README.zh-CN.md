@@ -66,7 +66,7 @@ spine-converter 用于在 Spine 3.5 至 4.3 之间转换 [Spine](https://esoteri
 | Python | 3.10 及以上，各命令行平台的 wheel | [bindings/python](bindings/python/README.zh-CN.md) |
 | Zig | Zig 0.17 | [bindings/zig](bindings/zig/README.zh-CN.md) |
 | Unity | 2021.2 及以上，桌面编辑器与播放器 | [bindings/unity](bindings/unity/README.zh-CN.md) |
-| Godot | 4.3 及以上，桌面平台 | [bindings/godot](bindings/godot/README.zh-CN.md) |
+| Godot | 4.3 及以上，桌面平台与 Android | [bindings/godot](bindings/godot/README.zh-CN.md) |
 
 ## 软件包
 

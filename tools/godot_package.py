@@ -19,6 +19,8 @@ LIBRARIES = {
     "windows.arm64": "spine_converter_godot.dll",
     "linux.x86_64": "libspine_converter_godot.so",
     "linux.arm64": "libspine_converter_godot.so",
+    "android.arm64": "libspine_converter_godot.so",
+    "android.x86_64": "libspine_converter_godot.so",
 }
 MACOS = "libspine_converter_godot.dylib"
 

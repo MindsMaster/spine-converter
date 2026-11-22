@@ -91,8 +91,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # the oldest supported and the newest release
-        api: [21, 36]
+        # the oldest supported and the newest release, Godot 4.7 needs API 24
+        include:
+          - api: 21
+            godot: "4.3"
+          - api: 36
+            godot: "4.3 4.7.2"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -103,9 +107,29 @@ jobs:
       - run: |
           zig build dist -Drid=android-arm64 -Dandroid-ndk="$ANDROID_NDK_HOME"
           zig build dist -Drid=android-x64 -Dandroid-ndk="$ANDROID_NDK_HOME"
+      - name: Godot test APK
+        run: |
+          zig build godot -Drid=android-arm64 -Dandroid-ndk="$ANDROID_NDK_HOME"
+          zig build godot -Drid=android-x64 -Dandroid-ndk="$ANDROID_NDK_HOME"
+          zig build godot -Drid=linux-x64
+          # the exporting editor loads the extension too
+          python tools/godot_package.py "$RUNNER_TEMP/godot.zip" linux.x86_64 android.arm64 android.x86_64
+          for version in ${{ matrix.godot }}; do
+            base=https://github.com/godotengine/godot/releases/download/$version-stable
+            curl -fsSL -o "$RUNNER_TEMP/godot-$version.zip" "$base/Godot_v$version-stable_linux.x86_64.zip"
+            python -m zipfile -e "$RUNNER_TEMP/godot-$version.zip" "$RUNNER_TEMP/godot-$version"
+            chmod +x "$RUNNER_TEMP/godot-$version/Godot_v$version-stable_linux.x86_64"
+            curl -fsSL -o "$RUNNER_TEMP/templates.tpz" "$base/Godot_v$version-stable_export_templates.tpz"
+            templates=~/.local/share/godot/export_templates/$version.stable
+            mkdir -p "$templates"
+            unzip -j -o "$RUNNER_TEMP/templates.tpz" templates/android_debug.apk templates/version.txt -d "$templates"
+            rm "$RUNNER_TEMP/templates.tpz"
+            bindings/godot/tests/export_android.sh "$RUNNER_TEMP/godot-$version/Godot_v$version-stable_linux.x86_64" \
+              "$RUNNER_TEMP/godot.zip" "$RUNNER_TEMP/godot-$version.apk"
+          done
       - name: 16 KB pages
         run: |
-          for so in zig-out/dist/android-*/*.so; do
+          for so in zig-out/dist/android-*/*.so zig-out/godot/android.*/*.so; do
             readelf -lW "$so" | awk '$1 == "LOAD" && $NF != "0x4000" { bad = 1 } END { exit bad }'
           done
       - name: Enable KVM
@@ -122,4 +146,6 @@ jobs:
           disk-size: 2048M
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
-          script: tests/android.sh "$ANDROID_NDK_HOME"
+          script: |
+            tests/android.sh "$ANDROID_NDK_HOME"
+            for v in ${{ matrix.godot }}; do bindings/godot/tests/android.sh "$RUNNER_TEMP/godot-$v.apk" || exit 1; done

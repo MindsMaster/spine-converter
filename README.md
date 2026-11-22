@@ -66,7 +66,7 @@ An application that ships one Spine runtime version can convert exports of other
 | Python | 3.10 and later, wheels for the CLI platforms | [bindings/python](bindings/python/README.md) |
 | Zig | Zig 0.17 | [bindings/zig](bindings/zig/README.md) |
 | Unity | 2021.2 and later, desktop editors and players | [bindings/unity](bindings/unity/README.md) |
-| Godot | 4.3 and later, desktop | [bindings/godot](bindings/godot/README.md) |
+| Godot | 4.3 and later, desktop and Android | [bindings/godot](bindings/godot/README.md) |
 
 ## Packages
 

@@ -1,5 +1,6 @@
+class_name SpineConverterTest
 extends SceneTree
-## Run by bindings/godot/tests/run.sh, calls with every argument typed take ptrcall and the others take call
+## Run by bindings/godot/tests/run.sh and android.sh, calls with every argument typed take ptrcall and the others take call
 
 const JSON_38 := '{"skeleton":{"spine":"3.8.99","hash":""},"bones":[]}'
 const PHYSICS := '{"skeleton":{"spine":"4.2.43","referenceScale":50},"bones":[{"name":"root"}],"physics":[{"name":"p","bone":"root"}]}'
