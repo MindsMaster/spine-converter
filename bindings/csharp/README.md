@@ -8,7 +8,7 @@
 dotnet add package SpineConverter
 ```
 
-The `SpineConverter` package carries the native library of every platform under `runtimes/<rid>/native` and .NET loads the right one. Without the package, the library loads as `spine_converter` from the default search path, so ship the file of `zig-out/dist/<rid>` beside the application or register a `NativeLibrary` resolver.
+The `SpineConverter` package carries the native library of every desktop platform and of Android arm64 and x64 under `runtimes/<rid>/native` and .NET loads the right one. Without the package, the library loads as `spine_converter` from the default search path, so ship the file of `zig-out/dist/<rid>` beside the application or register a `NativeLibrary` resolver.
 
 | Member | Use |
 |---|---|

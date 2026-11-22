@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Builds every release artifact into one directory with SHA256SUMS
-# Needs zig, dotnet, pnpm, and python3 with the build module unless SKIP_WHEELS is set
+# Needs zig, dotnet, pnpm, an Android NDK in ANDROID_NDK_HOME, and python3 with the build module unless SKIP_WHEELS is set
 # Usage: tools/package.sh <commit> [output dir]
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
@@ -22,7 +22,7 @@ targets=(
 	"linux-arm64 aarch64-linux linux-arm64 manylinux_2_17_aarch64.manylinux2014_aarch64.musllinux_1_1_aarch64"
 )
 
-zig build dist wasm godot -Dcommit="$commit"
+zig build dist wasm godot -Dcommit="$commit" -Dandroid-ndk="${ANDROID_NDK_HOME:?ANDROID_NDK_HOME names no Android NDK}"
 for target in "${targets[@]}"; do
 	read -r rid triple platform _ <<<"$target"
 	name="spine-converter-$version-$platform"

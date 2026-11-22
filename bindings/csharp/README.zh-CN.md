@@ -8,7 +8,7 @@
 dotnet add package SpineConverter
 ```
 
-`SpineConverter` 软件包在 `runtimes/<rid>/native` 下带有各平台的原生库，由 .NET 自动加载对应的一个。不使用软件包时，库按名称 `spine_converter` 从默认搜索路径加载，需将 `zig-out/dist/<rid>` 中的文件放在应用旁边，或注册 `NativeLibrary` 解析器。
+`SpineConverter` 软件包在 `runtimes/<rid>/native` 下带有各桌面平台以及 Android arm64 和 x64 的原生库，由 .NET 自动加载对应的一个。不使用软件包时，库按名称 `spine_converter` 从默认搜索路径加载，需将 `zig-out/dist/<rid>` 中的文件放在应用旁边，或注册 `NativeLibrary` 解析器。
 
 | 成员 | 用途 |
 |---|---|
