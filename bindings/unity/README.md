@@ -2,7 +2,7 @@
 
 # Unity package
 
-`cc.azuramc.spine-converter` carries the [C# binding](../csharp/README.md) as source in the `SpineConverter` assembly and the native library of every desktop player.
+`cc.azuramc.spine-converter` carries the [C# binding](../csharp/README.md) as source in the `SpineConverter` assembly and the native library of every desktop player and of Android.
 
 | Item | Support |
 |---|---|
@@ -10,8 +10,9 @@
 | Scripting backend | Mono and IL2CPP |
 | Editor | Windows x64, macOS, Linux x64 |
 | Players | Windows x64 and x86, macOS universal, Linux x64 |
+| Android players | ARM64 and x86-64 with IL2CPP |
 
-Android, iOS and WebGL players have no native library in this package.
+Android builds with ARMv7 enabled lack its library. iOS and WebGL players have no native library in this package.
 
 ## Installation
 
@@ -33,8 +34,8 @@ The members are listed in the [C# binding](../csharp/README.md). The assembly en
 ## Building
 
 ```
-zig build dist
+zig build dist -Dandroid-ndk=<path>
 python3 tools/unity_package.py cc.azuramc.spine-converter.tgz
 ```
 
-`tools/package.sh` builds the same file for a release.
+`-Dandroid-ndk=<path>` names the Android NDK the Android libraries need. `tools/package.sh` builds the same file for a release.
