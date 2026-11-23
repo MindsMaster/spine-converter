@@ -47,7 +47,7 @@ oracle/all.sh
 | JavaScript | `pnpm install`, `pnpm run build` and `pnpm test` in `bindings/js` after `zig build wasm` |
 | Python | see [bindings/python/README.md](bindings/python/README.md) |
 | Unity | `zig build dist -Dandroid-ndk=<path>`, then `python3 tools/unity_package.py <file>.tgz` |
-| Godot | `zig build godot -Dandroid-ndk=<path>`, `python3 tools/godot_package.py <file>.zip`, then `bindings/godot/tests/run.sh <godot binary> <file>.zip`, for Android `bindings/godot/tests/export_android.sh <godot binary> <file>.zip <file>.apk` and `bindings/godot/tests/android.sh <file>.apk` |
+| Godot | `zig build godot -Dandroid-ndk=<path>`, `python3 tools/godot_package.py <file>.zip`, then `bindings/godot/tests/run.sh <godot binary> <file>.zip`, for Android `bindings/godot/tests/export_android.sh <godot binary> <file>.zip <file>.apk` and `bindings/godot/tests/android.sh <file>.apk`, for iOS `bindings/godot/tests/export_ios.sh <godot binary> <file>.zip <file>.app` and `bindings/godot/tests/ios.sh <file>.app` |
 
 A new C ABI function reaches every binding in the same change.
 

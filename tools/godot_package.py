@@ -1,9 +1,10 @@
 """Builds the Godot addon zip from bindings/godot and zig-out/godot
 
 Usage: python3 tools/godot_package.py <output.zip> [feature tag ...]
-Feature tags limit the libraries, for example linux.x86_64 or macos
+Feature tags limit the libraries, for example linux.x86_64, macos or ios
 """
 
+import plistlib
 import sys
 import zipfile
 from pathlib import Path
@@ -22,7 +23,35 @@ LIBRARIES = {
     "android.arm64": "libspine_converter_godot.so",
     "android.x86_64": "libspine_converter_godot.so",
 }
-MACOS = "libspine_converter_godot.dylib"
+DYLIB = "libspine_converter_godot.dylib"
+XCFRAMEWORK = "libspine_converter_godot.xcframework"
+# library identifier, platform variant and the built slice of each architecture
+IOS_LIBRARIES = {
+    "ios-arm64": (None, {"arm64": "ios.arm64"}),
+    "ios-arm64_x86_64-simulator": ("simulator", {"arm64": "ios.simulator.arm64", "x86_64": "ios.simulator.x86_64"}),
+}
+
+
+def xcframework():
+    libraries = []
+    for identifier, (variant, slices) in IOS_LIBRARIES.items():
+        binaries = [(BUILT / tag / DYLIB).read_bytes() for tag in slices.values()]
+        yield f"{identifier}/{DYLIB}", binaries[0] if len(binaries) == 1 else universal(*binaries)
+        library = {
+            "BinaryPath": DYLIB,
+            "LibraryIdentifier": identifier,
+            "LibraryPath": DYLIB,
+            "SupportedArchitectures": list(slices),
+            "SupportedPlatform": "ios",
+        }
+        if variant:
+            library["SupportedPlatformVariant"] = variant
+        libraries.append(library)
+    yield "Info.plist", plistlib.dumps({
+        "AvailableLibraries": libraries,
+        "CFBundlePackageType": "XFWK",
+        "XCFrameworkFormatVersion": "1.0",
+    })
 
 
 def files(tags):
@@ -35,7 +64,10 @@ def files(tags):
         if not tags or tag in tags:
             yield f"bin/{tag}/{library}", (BUILT / tag / library).read_bytes()
     if not tags or "macos" in tags:
-        yield f"bin/macos/{MACOS}", universal(*((BUILT / tag / MACOS).read_bytes() for tag in ("macos.arm64", "macos.x86_64")))
+        yield f"bin/macos/{DYLIB}", universal(*((BUILT / tag / DYLIB).read_bytes() for tag in ("macos.arm64", "macos.x86_64")))
+    if not tags or "ios" in tags:
+        for path, data in xcframework():
+            yield f"bin/ios/{XCFRAMEWORK}/{path}", data
 
 
 def main():

@@ -5,6 +5,7 @@ config_version=5
 config/name="spine-converter test"
 run/main_scene="res://main.tscn"
 run/main_loop_type="SpineConverterTest"
+config/icon="res://icon.svg"
 
 [rendering]
 

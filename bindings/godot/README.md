@@ -8,10 +8,10 @@ The addon is a GDExtension that registers the class `SpineConverter`. Its static
 |---|---|
 | Godot | 4.3 or later, single precision builds |
 | Editor and exports | Windows x86_64, x86_32 and arm64, macOS universal, Linux x86_64 and arm64 |
-| Exports | Android arm64 and x86_64 |
-| Tests | `tests/run.sh` on Godot 4.3 and 4.7.2, `tests/android.sh` on Android 5.0 and 16 |
+| Exports | Android arm64 and x86_64, iOS 12 or later and the iOS simulator |
+| Tests | `tests/run.sh` on Godot 4.3 and 4.7.2, `tests/android.sh` on Android 5.0 and 16, `tests/ios.sh` in the iOS simulator |
 
-Android exports with `armeabi-v7a` or `x86` enabled fail for want of a library. iOS and Web exports have no library in this addon.
+Android exports with `armeabi-v7a` or `x86` enabled fail for want of a library. Web exports have no library in this addon. Xcode 26 links iOS exports only with the classic linker, `-ld_classic` in Other Linker Flags.
 
 ## Installation
 
@@ -69,6 +69,6 @@ python3 tools/godot_package.py spine-converter-godot.zip
 bindings/godot/tests/run.sh <godot binary> spine-converter-godot.zip
 ```
 
-`-Dandroid-ndk=<path>` names the Android NDK the Android libraries need. `tests/export_android.sh <godot binary> <addon zip> <apk>` exports the test project and needs the Android export templates, `ANDROID_HOME` and `JAVA_HOME`. `tests/android.sh <apk>` runs it on the device or emulator on adb.
+`-Dandroid-ndk=<path>` names the Android NDK the Android libraries need. `tests/export_android.sh <godot binary> <addon zip> <apk>` exports the test project and needs the Android export templates, `ANDROID_HOME` and `JAVA_HOME`. `tests/android.sh <apk>` runs it on the device or emulator on adb. The iOS libraries build only on macOS with Xcode. `tests/export_ios.sh <godot binary> <addon zip> <app>` exports the test project with the iOS export templates and builds it for the simulator. `tests/ios.sh <app>` runs it in the booted simulator.
 
 `tools/package.sh` builds the same file for a release.

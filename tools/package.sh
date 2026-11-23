@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Builds every release artifact into one directory with SHA256SUMS
-# Needs zig, dotnet, pnpm, an Android NDK in ANDROID_NDK_HOME, and python3 with the build module unless SKIP_WHEELS is set
+# Needs zig, dotnet, pnpm, an Android NDK in ANDROID_NDK_HOME, the iOS libraries of zig build dist godot from macOS in zig-out, and python3 with the build module unless SKIP_WHEELS is set
 # Usage: tools/package.sh <commit> [output dir]
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)

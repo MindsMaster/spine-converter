@@ -47,7 +47,7 @@ oracle/all.sh
 | JavaScript | 先 `zig build wasm`，再在 `bindings/js` 中运行 `pnpm install`、`pnpm run build` 和 `pnpm test` |
 | Python | 见 [bindings/python/README.zh-CN.md](bindings/python/README.zh-CN.md) |
 | Unity | 先 `zig build dist -Dandroid-ndk=<path>`，再 `python3 tools/unity_package.py <file>.tgz` |
-| Godot | 先 `zig build godot -Dandroid-ndk=<path>` 和 `python3 tools/godot_package.py <file>.zip`，再 `bindings/godot/tests/run.sh <godot binary> <file>.zip`，Android 先 `bindings/godot/tests/export_android.sh <godot binary> <file>.zip <file>.apk`，再 `bindings/godot/tests/android.sh <file>.apk` |
+| Godot | 先 `zig build godot -Dandroid-ndk=<path>` 和 `python3 tools/godot_package.py <file>.zip`，再 `bindings/godot/tests/run.sh <godot binary> <file>.zip`，Android 先 `bindings/godot/tests/export_android.sh <godot binary> <file>.zip <file>.apk`，再 `bindings/godot/tests/android.sh <file>.apk`，iOS 先 `bindings/godot/tests/export_ios.sh <godot binary> <file>.zip <file>.app`，再 `bindings/godot/tests/ios.sh <file>.app` |
 
 新增的 C ABI 函数须在同一改动中加入所有绑定。
 
