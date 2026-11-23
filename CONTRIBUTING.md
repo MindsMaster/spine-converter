@@ -42,6 +42,7 @@ oracle/all.sh
 |---|---|
 | C and C++ | part of `zig build test` |
 | Android | `zig build dist -Drid=android-x64 -Dandroid-ndk=<path>` and the same for `android-arm64`, then `tests/android.sh <path>` with a device or emulator on adb |
+| iOS | on macOS with Xcode `zig build dist -Drid=<rid>` for `ios-arm64`, `iossimulator-arm64` and `iossimulator-x64`, then `tests/ios.sh` with a booted simulator |
 | C# | `dotnet run --project bindings/csharp/Tests` after `zig build dist` |
 | JavaScript | `pnpm install`, `pnpm run build` and `pnpm test` in `bindings/js` after `zig build wasm` |
 | Python | see [bindings/python/README.md](bindings/python/README.md) |

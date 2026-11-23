@@ -2,7 +2,7 @@
 
 # C library
 
-The C ABI is declared in [include/spine_converter.h](../../include/spine_converter.h). Every other binding calls it. The libraries need only the operating system: `ntdll.dll` on Windows, `libSystem` on macOS, nothing on Linux, where glibc and musl systems both load them, and `libc.so` with `libm.so` on Android 5.0 and later.
+The C ABI is declared in [include/spine_converter.h](../../include/spine_converter.h). Every other binding calls it. The libraries need only the operating system: `ntdll.dll` on Windows, `libSystem` on macOS, nothing on Linux, where glibc and musl systems both load them, and `libc.so` with `libm.so` on Android 5.0 and later. iOS 12 and later get a static library that links with `libSystem`, the Apple silicon simulator iOS 14 and later.
 
 ## Linking
 
@@ -18,7 +18,7 @@ The platform archives of a release hold the header, the shared library and a lib
 cc app.c -Ispine-converter/include -Lspine-converter/lib -lspine_converter
 ```
 
-`zig build` builds the static library into `zig-out/lib` and `zig build dist` the shared library of every platform into `zig-out/dist/<rid>`. The Android libraries build only with `-Dandroid-ndk=<path>` naming an Android NDK.
+`zig build` builds the static library into `zig-out/lib` and `zig build dist` the shared library of every platform into `zig-out/dist/<rid>`. The Android libraries build only with `-Dandroid-ndk=<path>` naming an Android NDK, the iOS libraries only on macOS with Xcode.
 
 ## Usage
 

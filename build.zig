@@ -16,8 +16,8 @@ const oracles = [_]Oracle{
 
 /// rid is the .NET runtime identifier the C# binding loads from, godot the feature tag of the Godot extension
 const Dist = struct { triple: []const u8, rid: []const u8, godot: []const u8, libc: LibC = .zig };
-/// Zig ships no bionic
-const LibC = enum { zig, ndk };
+/// Zig ships no bionic and no iOS SDK
+const LibC = enum { zig, ndk, xcode };
 const dists = [_]Dist{
     .{ .triple = "x86_64-windows", .rid = "win-x64", .godot = "windows.x86_64" },
     .{ .triple = "aarch64-windows", .rid = "win-arm64", .godot = "windows.arm64" },
@@ -28,6 +28,10 @@ const dists = [_]Dist{
     .{ .triple = "aarch64-linux", .rid = "linux-arm64", .godot = "linux.arm64" },
     .{ .triple = "aarch64-linux-android.21", .rid = "android-arm64", .godot = "android.arm64", .libc = .ndk },
     .{ .triple = "x86_64-linux-android.21", .rid = "android-x64", .godot = "android.x86_64", .libc = .ndk },
+    .{ .triple = "aarch64-ios.12.0", .rid = "ios-arm64", .godot = "ios.arm64", .libc = .xcode },
+    // Apple silicon simulators start at iOS 14
+    .{ .triple = "aarch64-ios.14.0-simulator", .rid = "iossimulator-arm64", .godot = "ios.simulator.arm64", .libc = .xcode },
+    .{ .triple = "x86_64-ios.12.0-simulator", .rid = "iossimulator-x64", .godot = "ios.simulator.x86_64", .libc = .xcode },
 };
 
 pub fn build(b: *std.Build) void {
@@ -51,40 +55,51 @@ pub fn build(b: *std.Build) void {
     b.installFile("include/spine_converter.h", "include/spine_converter.h");
     b.installFile("bindings/cpp/spine_converter.hpp", "include/spine_converter.hpp");
 
-    const dist = b.step("dist", "Build the shared library for every release platform");
+    const dist = b.step("dist", "Build the shared library for every release platform, static for iOS");
     const godot = b.step("godot", "Build the Godot extension for every release platform");
     const only = b.option([]const u8, "rid", "Build dist and godot for this runtime identifier only");
     const ndk = b.option([]const u8, "android-ndk", "Android NDK to build the Android targets with, skipped without");
+    const macos = b.graph.host.result.os.tag == .macos;
     for (dists) |d| {
         if (only) |rid| if (!std.mem.eql(u8, rid, d.rid)) continue;
         const query = std.Target.Query.parse(.{ .arch_os_abi = d.triple }) catch unreachable;
         const resolved = b.resolveTargetQuery(query);
+        const sdk = if (d.libc == .xcode and macos) std.zig.system.darwin.getSdk(b.allocator, b.graph.io, &resolved.result) else null;
+        const missing: ?[]const u8 = switch (d.libc) {
+            .zig => null,
+            .ndk => if (ndk == null) "-Dandroid-ndk" else null,
+            .xcode => if (sdk == null) "a macOS host with Xcode" else null,
+        };
+        if (missing) |what| {
+            if (only != null) {
+                const fail = b.addFail(b.fmt("{s} needs {s}", .{ d.rid, what }));
+                dist.dependOn(&fail.step);
+                godot.dependOn(&fail.step);
+            }
+            continue;
+        }
         const libc: ?std.Build.LazyPath = switch (d.libc) {
             .zig => null,
-            .ndk => if (ndk) |path| androidLibC(b, path, resolved.result) else {
-                if (only != null) {
-                    const fail = b.addFail(b.fmt("{s} needs -Dandroid-ndk", .{d.rid}));
-                    dist.dependOn(&fail.step);
-                    godot.dependOn(&fail.step);
-                }
-                continue;
-            },
+            .ndk => androidLibC(b, ndk.?, resolved.result),
+            .xcode => xcodeLibC(b, sdk.?),
         };
         // Google Play page size requirement
-        const max_page_size: ?u64 = if (libc != null) 16 * 1024 else null;
+        const max_page_size: ?u64 = if (d.libc == .ndk) 16 * 1024 else null;
         const core_module = b.createModule(coreOptions(b, resolved, .ReleaseFast));
-        if (libc != null) core_module.link_libc = true;
+        if (d.libc != .zig) core_module.link_libc = true;
         const abi = abiModule(b, core_module);
-        const shared = b.addLibrary(.{
+        const library = b.addLibrary(.{
             .name = "spine_converter",
-            .linkage = .dynamic,
+            .linkage = if (d.libc == .xcode) .static else .dynamic,
             .root_module = abi,
         });
-        shared.root_module.strip = true;
-        shared.setLibCFile(libc);
-        shared.link_z_max_page_size = max_page_size;
+        library.root_module.strip = true;
+        library.setLibCFile(libc);
+        library.link_z_max_page_size = max_page_size;
+        // Xcode links no Zig runtime
+        if (d.libc == .xcode) library.bundle_compiler_rt = true;
         const dir: std.Build.InstallDir = .{ .custom = b.fmt("dist/{s}", .{d.rid}) };
-        dist.dependOn(&b.addInstallArtifact(shared, .{
+        dist.dependOn(&b.addInstallArtifact(library, .{
             .dest_dir = .{ .override = dir },
             .implib_dir = if (query.os_tag == .windows) .{ .override = .{ .custom = b.fmt("dist-implib/{s}", .{d.rid}) } } else .disabled,
             .pdb_dir = .disabled,
@@ -256,6 +271,20 @@ fn androidLibC(b: *std.Build, ndk: []const u8, target: std.Target) std.Build.Laz
         \\darwin_sdk_dir=
         \\
     , .{ b.pathJoin(&.{ usr, "include" }), b.pathJoin(&.{ usr, "include", triple }), crt, crt }));
+}
+
+fn xcodeLibC(b: *std.Build, sdk: []const u8) std.Build.LazyPath {
+    const usr = b.pathJoin(&.{ sdk, "usr" });
+    return b.addWriteFiles().add("libc.txt", b.fmt(
+        \\include_dir={s}/include
+        \\sys_include_dir={s}/include
+        \\cc_dir=
+        \\crt_dir={s}/lib
+        \\msvc_lib_dir=
+        \\kernel32_lib_dir=
+        \\darwin_sdk_dir={s}
+        \\
+    , .{ usr, usr, usr, sdk }));
 }
 
 fn importing(b: *std.Build, path: []const u8, core: *std.Build.Module, optimize: std.builtin.OptimizeMode) *std.Build.Module {

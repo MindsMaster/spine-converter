@@ -149,3 +149,27 @@ jobs:
           script: |
             tests/android.sh "$ANDROID_NDK_HOME"
             for v in ${{ matrix.godot }}; do bindings/godot/tests/android.sh "$RUNNER_TEMP/godot-$v.apk" || exit 1; done
+
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: 0.17.1
+
+      - run: for rid in ios-arm64 iossimulator-arm64 iossimulator-x64; do zig build dist -Drid=$rid; done
+      - name: Minimum iOS
+        run: |
+          for lib in ios-arm64:12.0 iossimulator-arm64:14.0 iossimulator-x64:12.0; do
+            minos=$(otool -l "zig-out/dist/${lib%:*}/libspine_converter.a" | awk '$1 == "minos" { print $2 }' | sort -u)
+            test "$minos" = "${lib#*:}" || { echo "$lib minos $minos"; exit 1; }
+          done
+      - name: Simulator
+        run: |
+          udid=$(xcrun simctl list devices available -j | python3 -c '
+          import json, sys
+          devices = json.load(sys.stdin)["devices"]
+          print(next(d["udid"] for runtime in sorted(devices, reverse=True) if "iOS" in runtime for d in devices[runtime] if d["name"].startswith("iPhone")))')
+          xcrun simctl bootstatus "$udid" -b
+          tests/ios.sh
