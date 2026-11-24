@@ -1,6 +1,6 @@
 {
   "name": "spine-converter",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Convert Spine skeleton data between every version from 3.5 to 4.3, WebAssembly build",
   "license": "SEE LICENSE IN LICENSE",
   "author": "an5w1r <an5w1r@163.com>",

@@ -1,6 +1,6 @@
 {
   "name": "cc.azuramc.spine-converter",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "displayName": "Spine Converter",
   "description": "Convert Spine skeleton data and atlases between every version from 3.5 to 4.3",
   "unity": "2021.2",

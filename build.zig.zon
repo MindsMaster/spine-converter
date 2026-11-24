@@ -1,6 +1,6 @@
 .{
     .name = .spine_converter,
-    .version = "1.0.0",
+    .version = "1.1.0",
     .fingerprint = 0x44e812ebb9e7da0,
     .minimum_zig_version = "0.17.1",
     .dependencies = .{},
