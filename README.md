@@ -85,6 +85,8 @@ Each GitHub release carries every file below, including the registry packages fo
 | File | Content | Install |
 |---|---|---|
 | `spine-converter-<version>-<platform>.zip` or `.tar.gz` | CLI, shared and static library, C and C++ headers | extract |
+| `spine-converter-<version>-android.tar.gz` | shared library per Android ABI, C and C++ headers | extract |
+| `spine-converter-<version>-ios.tar.gz` | static XCFramework for devices and the simulator with C and C++ headers | add it to the Xcode target |
 | `spine-converter-<version>-wasm32.wasm` | WebAssembly module | load directly |
 | `spine-converter-<version>-npm.tgz` | npm package | `npm install ./<file>` |
 | `SpineConverter.<version>.nupkg` | NuGet package | add the folder as a package source |
@@ -101,6 +103,8 @@ Each GitHub release carries every file below, including the registry packages fo
 | `macos-x64` | macOS 10.15 |
 | `macos-arm64` | macOS 11 |
 | `linux-x64` `linux-arm64` | any libc, glibc or musl |
+| `android` arm64-v8a and x86_64 | Android 5.0 |
+| `ios` | iOS 12, Apple silicon simulator iOS 14 |
 
 ## Command line
 

@@ -85,6 +85,8 @@ JavaScript、Python 和 C# 绑定已发布到各自的软件包仓库。命令�
 | 文件 | 内容 | 安装 |
 |---|---|---|
 | `spine-converter-<version>-<platform>.zip` 或 `.tar.gz` | 命令行工具、动态库与静态库、C 与 C++ 头文件 | 解压 |
+| `spine-converter-<version>-android.tar.gz` | 各 Android ABI 的动态库、C 与 C++ 头文件 | 解压 |
+| `spine-converter-<version>-ios.tar.gz` | 含 C 与 C++ 头文件的静态 XCFramework，支持真机与模拟器 | 添加到 Xcode target |
 | `spine-converter-<version>-wasm32.wasm` | WebAssembly 模块 | 直接加载 |
 | `spine-converter-<version>-npm.tgz` | npm 包 | `npm install ./<file>` |
 | `SpineConverter.<version>.nupkg` | NuGet 包 | 将所在目录添加为包源 |
@@ -101,6 +103,8 @@ JavaScript、Python 和 C# 绑定已发布到各自的软件包仓库。命令�
 | `macos-x64` | macOS 10.15 |
 | `macos-arm64` | macOS 11 |
 | `linux-x64` `linux-arm64` | 任意 libc，glibc 或 musl |
+| `android` arm64-v8a 与 x86_64 | Android 5.0 |
+| `ios` | iOS 12，Apple 芯片模拟器 iOS 14 |
 
 ## 命令行
 

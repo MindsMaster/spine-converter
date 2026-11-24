@@ -6,13 +6,15 @@ The C ABI is declared in [include/spine_converter.h](../../include/spine_convert
 
 ## Linking
 
-The platform archives of a release hold the header, the shared library and a library to link against.
+The platform archives of a release hold the header, the shared library and a library to link against. The iOS archive holds a static XCFramework with the headers.
 
 | Platform | Shared library | Link with | Define |
 |---|---|---|---|
 | Windows | `bin/spine_converter.dll` | `lib/spine_converter.lib`, import library of the DLL | `SPC_SHARED` |
 | macOS | `lib/libspine_converter.dylib` | the shared library or `lib/libspine_converter.a` | |
 | Linux | `lib/libspine_converter.so` | the shared library or `lib/libspine_converter.a` | |
+| Android | `lib/<abi>/libspine_converter.so`, `<abi>` is `arm64-v8a` or `x86_64` | the shared library | |
+| iOS | | `spine_converter.xcframework` | |
 
 ```
 cc app.c -Ispine-converter/include -Lspine-converter/lib -lspine_converter

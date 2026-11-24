@@ -17,12 +17,14 @@ jobs:
         with:
           version: 0.17.1
       - run: for rid in ios-arm64 iossimulator-arm64 iossimulator-x64; do zig build dist godot -Drid=$rid -Dcommit="${GITHUB_SHA::12}"; done
+      - run: tools/ios_xcframework.sh
       - uses: actions/upload-artifact@v7
         with:
           name: ios
           path: |
             zig-out/dist
             zig-out/godot
+            zig-out/ios
 
   package:
     needs: ios

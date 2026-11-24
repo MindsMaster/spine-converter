@@ -160,6 +160,7 @@ jobs:
           version: 0.17.1
 
       - run: for rid in ios-arm64 iossimulator-arm64 iossimulator-x64; do zig build dist -Drid=$rid; done
+      - run: tools/ios_xcframework.sh
       - name: Minimum iOS
         run: |
           for lib in ios-arm64:12.0 iossimulator-arm64:14.0 iossimulator-x64:12.0; do

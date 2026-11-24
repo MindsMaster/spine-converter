@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Builds every release artifact into one directory with SHA256SUMS
-# Needs zig, dotnet, pnpm, an Android NDK in ANDROID_NDK_HOME, the iOS libraries of zig build dist godot from macOS in zig-out, and python3 with the build module unless SKIP_WHEELS is set
+# Needs zig, dotnet, pnpm, an Android NDK in ANDROID_NDK_HOME, the iOS libraries of zig build dist godot and tools/ios_xcframework.sh from macOS in zig-out, and python3 with the build module unless SKIP_WHEELS is set
 # Usage: tools/package.sh <commit> [output dir]
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
@@ -42,6 +42,22 @@ for target in "${targets[@]}"; do
 		tar -czf "$out/$name.tar.gz" -C "$stage" "$name"
 	fi
 done
+
+name="spine-converter-$version-android"
+mkdir -p "$stage/$name/include"
+for abi in arm64-v8a:android-arm64 x86_64:android-x64; do
+	mkdir -p "$stage/$name/lib/${abi%:*}"
+	cp zig-out/dist/"${abi#*:}"/libspine_converter.so "$stage/$name/lib/${abi%:*}/"
+done
+cp include/spine_converter.h bindings/cpp/spine_converter.hpp "$stage/$name/include/"
+cp LICENSE LICENSE-MIT README.md "$stage/$name/"
+tar -czf "$out/$name.tar.gz" -C "$stage" "$name"
+
+name="spine-converter-$version-ios"
+mkdir -p "$stage/$name"
+cp -R zig-out/ios/spine_converter.xcframework "$stage/$name/"
+cp LICENSE LICENSE-MIT README.md "$stage/$name/"
+tar -czf "$out/$name.tar.gz" -C "$stage" "$name"
 cp zig-out/bin/spine_converter.wasm "$out/spine-converter-$version-wasm32.wasm"
 
 (cd bindings/js && pnpm install --frozen-lockfile && pnpm run build && pnpm pack --pack-destination "$stage")

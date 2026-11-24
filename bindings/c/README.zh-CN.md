@@ -6,13 +6,15 @@ C ABI 声明于 [include/spine_converter.h](../../include/spine_converter.h)，�
 
 ## 链接
 
-发布的平台压缩包包含头文件、动态库和用于链接的库。
+发布的平台压缩包包含头文件、动态库和用于链接的库。iOS 压缩包包含带头文件的静态 XCFramework。
 
 | 平台 | 动态库 | 链接 | 宏定义 |
 |---|---|---|---|
 | Windows | `bin/spine_converter.dll` | `lib/spine_converter.lib`，DLL 的导入库 | `SPC_SHARED` |
 | macOS | `lib/libspine_converter.dylib` | 动态库或 `lib/libspine_converter.a` | |
 | Linux | `lib/libspine_converter.so` | 动态库或 `lib/libspine_converter.a` | |
+| Android | `lib/<abi>/libspine_converter.so`，`<abi>` 为 `arm64-v8a` 或 `x86_64` | 动态库 | |
+| iOS | | `spine_converter.xcframework` | |
 
 ```
 cc app.c -Ispine-converter/include -Lspine-converter/lib -lspine_converter
