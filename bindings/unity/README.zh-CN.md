@@ -2,7 +2,7 @@
 
 # Unity 包
 
-`cc.azuramc.spine-converter` 以源码形式包含 [C# 绑定](../csharp/README.zh-CN.md)，编译为 `SpineConverter` 程序集，并附带各桌面平台以及 Android 的原生库。
+`cc.azuramc.spine-converter` 以源码形式包含 [C# 绑定](../csharp/README.zh-CN.md)，编译为 `SpineConverter` 程序集，并附带各桌面平台、Android 以及 iOS 的原生库。
 
 | 项目 | 支持 |
 |---|---|
@@ -11,8 +11,9 @@
 | 编辑器 | Windows x64、macOS、Linux x64 |
 | 播放器 | Windows x64 与 x86、macOS universal、Linux x64 |
 | Android 播放器 | ARM64 与 x86-64，使用 IL2CPP |
+| iOS 播放器 | iOS 12 及以上，使用设备 SDK 构建 |
 
-启用 ARMv7 的 Android 构建缺少其原生库。本包不含 iOS 和 WebGL 播放器的原生库。
+启用 ARMv7 的 Android 构建缺少其原生库。面向模拟器 SDK 的 iOS 构建无法链接。本包不含 WebGL 播放器的原生库。
 
 ## 安装
 
@@ -38,4 +39,4 @@ zig build dist -Dandroid-ndk=<path>
 python3 tools/unity_package.py cc.azuramc.spine-converter.tgz
 ```
 
-`-Dandroid-ndk=<path>` 指定 Android 库所需的 Android NDK。发布时由 `tools/package.sh` 生成同一文件。
+`-Dandroid-ndk=<path>` 指定 Android 库所需的 Android NDK。iOS 的库仅在装有 Xcode 的 macOS 上构建。发布时由 `tools/package.sh` 生成同一文件。

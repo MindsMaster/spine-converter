@@ -24,6 +24,7 @@ PLUGINS = {
     "macOS/libspine_converter.dylib": ("osx", "OSX", "AnyCPU", "OSXUniversal", "AnyCPU"),
     "Android/arm64-v8a/libspine_converter.so": ("android-arm64", None, None, "Android", "ARM64"),
     "Android/x86_64/libspine_converter.so": ("android-x64", None, None, "Android", "X86_64"),
+    "iOS/libspine_converter.a": ("ios-arm64", None, None, "iPhone", "AnyCPU"),
 }
 PLAYERS = ("Win", "Win64", "Linux64", "OSXUniversal")
 
@@ -66,6 +67,11 @@ def file_meta(path):
         data.append(f"  - first:\n      Standalone: {p}\n    second:\n      enabled: {1 if on else 0}\n      settings:\n        CPU: {player_cpu if on else 'None'}\n")
     if player == "Android":
         data.append(f"  - first:\n      Android: Android\n    second:\n      enabled: 1\n      settings:\n        CPU: {player_cpu}\n")
+    if player == "iPhone":
+        data.append(
+            "  - first:\n      iPhone: iOS\n    second:\n      enabled: 1\n      settings:\n"
+            "        AddToEmbeddedBinaries: false\n        CPU: AnyCPU\n        CompileFlags: \n        FrameworkDependencies: \n"
+        )
     return head + (
         "PluginImporter:\n  externalObjects: {}\n  serializedVersion: 2\n  iconMap: {}\n  executionOrder: {}\n"
         "  defineConstraints: []\n  isPreloaded: 0\n  isOverridable: 0\n  isExplicitlyReferenced: 0\n"

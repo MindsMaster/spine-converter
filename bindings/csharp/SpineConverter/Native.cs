@@ -5,7 +5,12 @@ namespace SpineConverter
     /// <summary>Members mirror include/spine_converter.h</summary>
     internal static unsafe class Native
     {
+#if UNITY_IOS && !UNITY_EDITOR
+        /// <summary>Static plugins link into the iOS player</summary>
+        public const string Library = "__Internal";
+#else
         public const string Library = "spine_converter";
+#endif
         public const uint AbiVersion = 1;
 
         [StructLayout(LayoutKind.Sequential)]

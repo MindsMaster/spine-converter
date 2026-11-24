@@ -65,7 +65,7 @@ An application that ships one Spine runtime version can convert exports of other
 | JavaScript and TypeScript | browsers and Node 18 or later, WebAssembly | [bindings/js](bindings/js/README.md) |
 | Python | 3.10 and later, wheels for the CLI platforms | [bindings/python](bindings/python/README.md) |
 | Zig | Zig 0.17 | [bindings/zig](bindings/zig/README.md) |
-| Unity | 2021.2 and later, desktop editors and players, Android players | [bindings/unity](bindings/unity/README.md) |
+| Unity | 2021.2 and later, desktop editors and players, Android and iOS players | [bindings/unity](bindings/unity/README.md) |
 | Godot | 4.3 and later, desktop, Android and iOS | [bindings/godot](bindings/godot/README.md) |
 
 ## Packages
